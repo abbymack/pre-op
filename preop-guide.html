@@ -42,7 +42,8 @@ body {
   height: 100vh;
   overflow-y: auto;
   z-index: 100;
-  padding: 20px 0 32px;
+  padding: 48px 0 32px;
+  transition: transform 0.2s ease;
 }
 #sidebar .brand {
   font-size: 13px;
@@ -76,12 +77,73 @@ body {
 #sidebar a:hover { color: var(--black); border-left-color: var(--black); }
 #sidebar a.active { color: var(--black); border-left-color: var(--black); font-weight: 700; }
 
+body.sidebar-hidden #sidebar {
+  transform: translateX(-100%);
+}
+
+#sidebar-toggle {
+  position: fixed;
+  top: 10px;
+  left: 12px;
+  z-index: 101;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--black);
+  background: var(--white);
+  color: var(--black);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: left 0.2s ease;
+  font-family: inherit;
+}
+#sidebar-toggle:hover {
+  background: var(--black);
+  color: var(--white);
+}
+#sidebar-toggle svg {
+  display: block;
+  flex-shrink: 0;
+}
+body:not(.sidebar-hidden) #sidebar-toggle {
+  left: 14px;
+}
+body.sidebar-hidden #sidebar-toggle {
+  left: 12px;
+}
+body.sidebar-hidden #sidebar-toggle .sidebar-toggle-icon .icon-collapse {
+  display: none;
+}
+body.sidebar-hidden #sidebar-toggle .sidebar-toggle-icon .icon-menu {
+  display: block;
+}
+body:not(.sidebar-hidden) #sidebar-toggle .sidebar-toggle-icon .icon-collapse {
+  display: block;
+}
+body:not(.sidebar-hidden) #sidebar-toggle .sidebar-toggle-icon .icon-menu {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  #sidebar,
+  #main,
+  #sidebar-toggle {
+    transition-duration: 0.01ms;
+  }
+}
+
 /* ── Main ── */
 #main {
   margin-left: var(--sidebar-w);
   flex: 1;
   padding: 48px 56px 80px;
   max-width: calc(var(--sidebar-w) + 880px);
+  transition: margin-left 0.2s ease;
+}
+body.sidebar-hidden #main {
+  margin-left: 0;
 }
 
 /* ── Page header ── */
@@ -105,6 +167,9 @@ body {
 
 /* ── Section headings ── */
 .section { margin-bottom: 56px; }
+#overview > p {
+  font-size: 14px;
+}
 [id] { scroll-margin-top: 24px; }
 h2 {
   font-size: 22px;
@@ -303,13 +368,17 @@ details[open] > summary::before { transform: rotate(90deg); }
   line-height: 1.55;
 }
 
-/* ── METs visual scale ── */
+/* ── METs visual scale (grid: same ratios as 1 : 1.5 : 0.5 : 3 : 2) ── */
 .mets-scale {
-  position: relative;
   margin: 20px 0 28px;
+  --mets-cols: 1fr 1.5fr 0.5fr 3fr 2fr;
+}
+.mets-bar-wrap {
+  margin-bottom: 2px;
 }
 .mets-bar {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--mets-cols);
   height: 40px;
   border-radius: 4px;
   overflow: hidden;
@@ -319,40 +388,35 @@ details[open] > summary::before { transform: rotate(90deg); }
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 0;
   font-size: 12px;
   font-weight: 700;
   color: var(--white);
   border-right: 2px solid var(--black);
 }
 .mets-seg:last-child { border-right: none; }
+/* Threshold: left edge of the “4” column (between 2–3 and 4) */
+.mets-bar .mets-seg:nth-child(3) {
+  border-left: 3px solid var(--black);
+}
+.mets-bar .mets-seg:nth-child(2) {
+  border-right: none;
+}
 .mets-seg.s1 { background: #d32f2f; flex: 1; }
 .mets-seg.s2 { background: #e87b00; flex: 2; }
 .mets-seg.s3 { background: #f4b400; flex: 1; color: #222; }
 .mets-seg.s4 { background: #2e7d32; flex: 5; }
 .mets-labels {
-  display: flex;
+  display: grid;
+  grid-template-columns: var(--mets-cols);
   margin-top: 6px;
   font-size: 12px;
   color: var(--muted);
-}
-.mets-threshold {
-  position: absolute;
-  left: calc(4 / 10 * 100%);
-  top: -8px;
-  transform: translateX(-50%);
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--black);
   text-align: center;
-  white-space: nowrap;
+  gap: 0;
 }
-.mets-threshold::after {
-  content: '';
-  display: block;
-  width: 2px;
-  height: 52px;
-  background: var(--black);
-  margin: 2px auto 0;
+.mets-labels > span {
+  min-width: 0;
 }
 
 /* ── RCRI / Caprini calculator ── */
@@ -592,13 +656,47 @@ details[open] > summary::before { transform: rotate(90deg); }
   margin: 8px 0 16px;
   color: #333;
 }
+
+/* ── Footer ── */
+.site-footer {
+  margin-top: 72px;
+  padding: 28px 0 8px;
+  border-top: 2px solid var(--black);
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.site-footer p {
+  margin-bottom: 12px;
+  max-width: 52em;
+}
+.site-footer .footer-meta {
+  font-size: 11px;
+  color: #888;
+  margin-bottom: 0;
+}
+.site-footer .footer-byline {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--text);
+  font-weight: 600;
+}
 </style>
 </head>
 <body>
 
+<button type="button" id="sidebar-toggle" aria-controls="sidebar" aria-expanded="true" aria-label="Hide navigation">
+  <span class="sidebar-toggle-icon" aria-hidden="true">
+    <svg class="icon-collapse" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    <svg class="icon-menu" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+  </span>
+</button>
+
 <!-- ═══ SIDEBAR ═══ -->
 <nav id="sidebar">
-  <div class="brand">Pre-Op<br>Companion Guide</div>
+  <div class="brand">PRE-OP EVAL<br> COMPANION GUIDE</div>
 
   <div class="nav-group">
     <div class="nav-label">Template</div>
@@ -610,17 +708,17 @@ details[open] > summary::before { transform: rotate(90deg); }
 
   <div class="nav-group">
     <div class="nav-label">Risk Tools</div>
-    <a href="#rcri">RCRI Calculator</a>
-    <a href="#surgery-risk">Surgery Risk</a>
     <a href="#mets">Functional Status / METs</a>
-    <a href="#caprini">Caprini VTE</a>
+    <a href="#surgery-risk">Surgery Risk</a>
+    <a href="#rcri">RCRI Calculator</a>
   </div>
 
   <div class="nav-group">
     <div class="nav-label">Decision Support</div>
     <a href="#further-testing">Further Testing</a>
-    <a href="#abx">Antibiotic Prophylaxis</a>
     <a href="#meds">Medication Management</a>
+    <a href="#abx">Antibiotic Prophylaxis</a>
+    <a href="#caprini">Caprini VTE</a>
   </div>
 
   <div class="nav-group">
@@ -635,17 +733,14 @@ details[open] > summary::before { transform: rotate(90deg); }
 
 <div class="page-header">
   <h1>Pre-Op Evaluation<br>Companion Guide</h1>
-  <p>Bedside reference for preoperative assessment and medical optimization</p>
 </div>
 
 <!-- ═══ OVERVIEW ═══ -->
 <div class="section" id="overview">
   <h2>Template Overview</h2>
-  <p>Three components, in order. Identify risks, optimize, communicate to patient and surgeon, document rationale.</p>
+  <p>A preoperative evaluation is among the most valuable contributions an internist makes to a patient's surgical care. Every operation carries intrinsic risk alongside modifiable risk, and our role is to identify and address the latter, targeting conditions such as uncontrolled hypertension or diabetes that meaningfully increase perioperative danger. A thorough evaluation also provides an individualized estimate of total surgical risk, which is essential for informed consent and shared decision making. The goal is not to order every available test, but to ask the right questions, act on findings that matter, and communicate risk clearly so that patients and surgeons can proceed with confidence.</p>
 
-  <div class="callout danger">
-    <strong>First step before anything else:</strong> Screen for the "Killer 6" active high-risk cardiac conditions. If present, do not proceed with elective surgery.
-  </div>
+  <p>To get started, add the Smart Phrases below to your note. Then use this guide to help you complete the evaluation.</p>
 
   <table>
     <thead><tr><th>Component</th><th>Key Focus</th><th>Smart Phrase</th></tr></thead>
@@ -655,6 +750,10 @@ details[open] > summary::before { transform: rotate(90deg); }
       <tr><td><strong>Assessment &amp; Plan (A/P)</strong></td><td>Risk classification, RCRI, Caprini, meds, further testing, abx ppx, code status, transfusion consent</td><td>PREOP-A</td></tr>
     </tbody>
   </table>
+
+  <div class="callout danger">
+    <strong>Killer 6:</strong> Screen for the 6 highest risk conditions ("Killer 6"): If present, postpone elective surgery to optimize. See <a href="#killer6">Killer 6 section</a>.
+  </div>
 </div>
 
 <!-- ═══ SUBJECTIVE ═══ -->
@@ -662,18 +761,18 @@ details[open] > summary::before { transform: rotate(90deg); }
   <h2>Subjective (S)</h2>
 
   <span class="field-label">HPI</span>
-  <p>State the planned surgery, indication, date if known, and surgeon. Include age and relevant background conditions upfront.</p>
-  <div class="sample">"61M with HTN, HLD, and RA presenting for pre-op evaluation prior to bunionectomy + hammertoe repair scheduled with Dr. [Name]. Indication is chronic pain limiting ambulation."</div>
+  <p>State the planned surgery, indication, date if known, and surgeon.</p>
+  <div class="sample">"61M with HTN, HLD, and RA presenting for pre-op evaluation prior to bunionectomy + hammertoe repair scheduled with Dr. [Name] indicated due to chronic pain limiting ambulation."</div>
 
   <hr>
 
   <span class="field-label">PMHx</span>
-  <p>List all significant medical problems. Omit minor or resolved issues. For major conditions, include key details:</p>
+  <p>List all significant medical problems. Omit minor or resolved issues. For major conditions, include key details such as:</p>
   <ul>
-    <li>Diabetes → most recent A1c (must be within 3 months of surgery)</li>
-    <li>CHF → most recent EF, compensated vs. decompensated</li>
+    <li>Diabetes → most recent A1c</li>
+    <li>CHF → most recent EF</li>
     <li>CKD → baseline creatinine</li>
-    <li>CAD → stent type, date, revascularization status</li>
+    <li>CAD → stent type, date</li>
     <li>OSA → CPAP use, compliance</li>
   </ul>
 
@@ -712,7 +811,7 @@ details[open] > summary::before { transform: rotate(90deg); }
   <hr>
 
   <span class="field-label">PSH</span>
-  <p>Prior surgeries with attention to: anesthesia intolerance or reactions, prior surgical complications, difficult airway history, malignant hyperthermia.</p>
+  <p>Prior surgeries with attention to anesthesia intolerance or reactions, prior surgical complications, difficult airway history, and h/o malignant hyperthermia.</p>
 
   <hr>
 
@@ -724,13 +823,13 @@ details[open] > summary::before { transform: rotate(90deg); }
   <span class="field-label">Social History</span>
   <p>Tobacco (ppd, quit date or active), EtOH (frequency/quantity), illicit drugs, and — critically — <strong>functional status</strong>.</p>
   <div class="callout">
-    <strong>Functional Status:</strong> "Can you climb 2 flights of stairs or walk 2 blocks at a brisk pace without stopping?" If yes → ≥4 METs. If no → consider further cardiac workup. See <a href="#mets">METs section</a>.
+    <strong>Functional Status:</strong> "Can you climb 2 flights of stairs or walk 2 blocks at a brisk pace without stopping?" If yes → ≥4 METs. If no → consider further workup. See <a href="#mets">METs section</a>.
   </div>
 
   <hr>
 
   <span class="field-label">Family History</span>
-  <p>Focus on bleeding disorders, clotting disorders (thrombophilia, DVT/PE), and anesthesia problems (malignant hyperthermia).</p>
+  <p>Focus on bleeding disorders, clotting disorders, and anesthesia problems (malignant hyperthermia).</p>
 
   <hr>
 
@@ -739,11 +838,11 @@ details[open] > summary::before { transform: rotate(90deg); }
   <table>
     <thead><tr><th>Domain</th><th>Key Questions / Red Flags</th></tr></thead>
     <tbody>
-      <tr><td><strong>Cardiovascular</strong></td><td>Chest pain, palpitations, dyspnea on exertion, light-headedness, syncope → consider workup</td></tr>
-      <tr><td><strong>Pulmonary</strong></td><td>Cough, SOB, URI symptoms. Snoring + daytime sleepiness → screen for undiagnosed OSA</td></tr>
+      <tr><td><strong>Cardiovascular</strong></td><td>Chest pain, palpitations, DOE, and light-headedness/syncope. Confirm any h/o cardiac events or procedures (MI, stents PPM)</td></tr>
+      <tr><td><strong>Pulmonary</strong></td><td>Cough, SOB, URI symptoms. Snoring? CPAP use?</td></tr>
       <tr><td><strong>Bleeding / Clotting</strong></td><td>Easy bruising, excessive bleeding with prior procedures, DVT/PE history</td></tr>
-      <tr><td><strong>Infection</strong></td><td>Active fevers, chills, current antibiotic use → delay elective surgery; notify surgeon</td></tr>
-      <tr><td><strong>GI</strong></td><td>Gastroparesis history (relevant for GLP-1 use and aspiration risk)</td></tr>
+      <tr><td><strong>Infection</strong></td><td>Fevers, chills, current or very recent antibiotic use. Immunocompromised?</td></tr>
+      <tr><td><strong>GI</strong></td><td>N/V, abdominal pain, and melena/hematochezia. Gastroparesis history and GLP-1 use</td></tr>
     </tbody>
   </table>
 </div>
@@ -753,27 +852,27 @@ details[open] > summary::before { transform: rotate(90deg); }
   <h2>Objective (O)</h2>
 
   <span class="field-label">Vital Signs</span>
-  <p>Document T, HR, BP, RR, weight, BMI. Flag uncontrolled hypertension (&gt;180/110), tachycardia, or low O₂ saturation.</p>
+  <p>Be sure to document temp, HR, BP, RR, weight, and BMI. Take note of uncontrolled hypertension, tachycardia, or low O₂ saturation.</p>
 
   <hr>
 
   <span class="field-label">Physical Exam</span>
   <p>Prioritize the cardiopulmonary exam. Use the CLUE exam if indicated.</p>
   <table>
-    <thead><tr><th>Area</th><th>What to Assess</th><th>Key Findings</th></tr></thead>
+    <thead><tr><th>Area</th><th>What to Assess</th></tr></thead>
     <tbody>
-      <tr><td><strong>Neck (JVP)</strong></td><td>Elevated JVP → volume overload / CHF</td><td>JVP &lt;8cm</td></tr>
-      <tr><td><strong>Lungs</strong></td><td>Wheezes, rhonchi, crackles (rales → pulmonary edema)</td><td>CTAB</td></tr>
-      <tr><td><strong>Cardiovascular</strong></td><td>Rate, rhythm, murmurs, S3/S4</td><td>RRR, no murmur</td></tr>
-      <tr><td><strong>Abdomen</strong></td><td>Distension, ascites (especially in liver disease)</td><td>Soft, non-tender</td></tr>
-      <tr><td><strong>Extremities</strong></td><td>Bilateral leg edema → CHF or venous insufficiency</td><td>No BLE edema</td></tr>
+      <tr><td><strong>Neck (JVP)</strong></td><td>Elevated JVP → volume overload / CHF</td></tr>
+      <tr><td><strong>Lungs</strong></td><td>Wheezes, rhonchi, crackles (rales → pulmonary edema)</td></tr>
+      <tr><td><strong>Cardiovascular</strong></td><td>Rate, rhythm, murmurs, S3/S4</td></tr>
+      <tr><td><strong>Abdomen</strong></td><td>Distension, ascites (especially in liver disease), tenderness</td></tr>
+      <tr><td><strong>Extremities</strong></td><td>Bilateral leg edema → CHF or venous insufficiency</td></tr>
     </tbody>
   </table>
 
   <hr>
 
   <span class="field-label">Recent Data</span>
-  <p>List relevant results: CBC, BMP, creatinine, A1c (within 3 months for DM), EKG findings, echo (EF, valve status), CXR. Flag any critical values affecting clearance.</p>
+  <p>List relevant results: CBC, CMP, A1c, EKG, echo, CXR, ect. See <a href="#further-testing">Further testing section</a> for decision support on ordering additional testing or workup.</p>
 </div>
 
 <!-- ═══ A/P ═══ -->
@@ -782,32 +881,101 @@ details[open] > summary::before { transform: rotate(90deg); }
 
   <div class="callout warn">The A/P synthesizes everything. Every item below must be addressed.</div>
 
-  <h3>Required Elements — Every Pre-Op A/P</h3>
+  <h3>Required Elements</h3>
   <ol>
-    <li><strong>Patient risk</strong> — low, moderate, or high (based on active conditions and RCRI)</li>
-    <li><strong>Surgery risk</strong> — inherent procedure risk (low / intermediate / high)</li>
-    <li><strong>RCRI</strong> — score and estimated 30-day MACE risk percentage</li>
-    <li><strong>Functional status</strong> — METs achieved, and whether ≥4 METs</li>
-    <li><strong>Killer 6 status</strong> — confirm absence of active high-risk cardiac conditions</li>
-    <li><strong>Further testing</strong> — what is ordered, and why (or why no workup is needed)</li>
-    <li><strong>Medication instructions</strong> — hold/continue/adjust; inform patient AND surgeon</li>
-    <li><strong>Antibiotic prophylaxis</strong> — indicated or not, with regimen if applicable</li>
-    <li><strong>Caprini VTE score</strong> — score, risk tier, prophylaxis recommendation</li>
+    <li><strong>Patient risk</strong> — low, moderate, or high (based on active conditions and RCRI score)</li>
+    <li><strong><a href="#surgery-risk">Surgery risk</a></strong> — inherent procedure risk (low / intermediate / high)</li>
+    <li><strong><a href="#rcri">RCRI</a></strong> — score and estimated 30-day MACE risk percentage</li>
+    <li><strong><a href="#further-testing">Further testing</a></strong> — what is ordered, and why (or why no workup is needed)</li>
+    <li><strong><a href="#meds">Medication instructions</a></strong> — hold/continue/adjust; inform patient AND surgeon</li>
+    <li><strong><a href="#abx">Antibiotic prophylaxis</a></strong> — indicated or not, with regimen if applicable</li>
+    <li><strong><a href="#caprini">Caprini VTE score</a></strong> — score, risk tier, prophylaxis recommendation</li>
     <li><strong>Transfusion consent</strong> — documented (or patient's decline documented)</li>
     <li><strong>Code status</strong> — confirmed and documented</li>
   </ol>
 
-  <div class="callout">End the A/P with a clear declarative statement: "Patient is medically optimized and cleared for surgery" — or document why they are not, and what action is needed.</div>
+  <div class="callout">End the A/P with a clear declarative statement: "Patient is medically optimized for surgery" — or document why they are not, and what action is needed.</div>
 
   <h3>Sample Language</h3>
   <div class="cols2">
     <div class="card">
       <h4>Low-risk patient, low-risk surgery</h4>
-      <p>"Low risk for a low-risk procedure. No active high-risk cardiac conditions. RCRI 0 — estimated 30-day MACE risk &lt;1%. Functional status ≥4 METs. No further cardiac workup indicated."</p>
+      <p>"Low risk for a low-risk procedure. No active high-risk cardiac conditions. RCRI 0 — estimated 30-day MACE risk &lt;1%. Functional status ≥4 METs. No further cardiac workup indicated. Patient is medically optimized for surgery."</p>
     </div>
     <div class="card">
       <h4>Elevated-risk patient</h4>
       <p>"Moderate risk for an intermediate-risk procedure. RCRI 2 — estimated 30-day MACE risk ~2.5%. Functional status &lt;4 METs. Further workup with stress testing ordered given elevated MACE risk and poor functional status."</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ METs ═══ -->
+<div class="section" id="mets">
+  <h2>Functional Status / METs</h2>
+  <p>Functional status is one of the strongest predictors of cardiovascular readiness for surgery. Patients who cannot perform at least 4 METs at baseline need further cardiac evaluation considered.</p>
+
+  <div class="callout"><strong>The threshold is 4 METs.</strong> Ask: "Can you climb 2 flights of stairs or walk 2 blocks on flat ground at a brisk pace without stopping?" Yes → ≥4 METs.</div>
+
+  <!-- Visual METs scale -->
+  <div class="mets-scale">
+    <div class="mets-bar-wrap">
+      <div class="mets-bar">
+        <div class="mets-seg s1">1</div>
+        <div class="mets-seg s2">2–3</div>
+        <div class="mets-seg s3" style="color:#333;">4</div>
+        <div class="mets-seg s4">5–9</div>
+        <div class="mets-seg s4" style="background:#1b5e20;">10+</div>
+      </div>
+    </div>
+    <div class="mets-labels">
+      <span>Minimal</span>
+      <span>Light</span>
+      <span style="font-weight:800; color:#000;">✓ Target</span>
+      <span>Good</span>
+      <span>Excellent</span>
+    </div>
+  </div>
+
+  <table>
+    <thead><tr><th>METs</th><th>What It Means</th><th>Activity Examples</th></tr></thead>
+    <tbody>
+      <tr><td><strong>1</strong></td><td>Basic self-care only</td><td>Eating, dressing, walking slowly around the house</td></tr>
+      <tr><td><strong>2–3</strong></td><td>Light activity, limited reserve</td><td>Cooking, light housework, walking 1–2 blocks slowly</td></tr>
+      <tr><td><strong style="color:#1a4d2e;">4 ✓</strong></td><td><strong>Target threshold — adequate for most surgeries</strong></td><td>Climbing 2 flights of stairs, walking 2 blocks at 3–4 mph, light yard work, golf (walking)</td></tr>
+      <tr><td><strong>5–9</strong></td><td>Good to excellent functional status</td><td>Running, swimming laps, doubles tennis, vigorous dancing</td></tr>
+      <tr><td><strong>&gt;10</strong></td><td>Excellent cardiovascular reserve</td><td>Competitive sports, heavy manual labor, vigorous running</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Documentation Language</h3>
+  <div class="sample">Adequate: "Patient fully functional at baseline. Able to climb 2 flights of stairs and walk several blocks without symptoms. Functional status ≥4 METs."</div>
+  <div class="sample">Limited: "Patient with limited functional status. Unable to climb a full flight of stairs due to dyspnea. Functional status estimated 2-3 METs. Further cardiac evaluation warranted."</div>
+  <p class="tip">If functional status is unknown or unreliable, treat as &lt;4 METs and apply workup criteria accordingly.</p>
+</div>
+
+<!-- ═══ SURGERY RISK ═══ -->
+<div class="section" id="surgery-risk">
+  <h2>Surgery Risk Classification</h2>
+  <p>Required element of every pre-op eval. Risk is based on expected physiologic disruption, hemodynamic impact, and blood loss potential.</p>
+
+  <div class="callout danger"><strong>Emergent/urgent surgery is an independent risk factor.</strong> Document and communicate this explicitly regardless of other risk factors.</div>
+  <div class="callout warn">Cardiac workup is required for <strong>all</strong> patients undergoing <strong>liver transplant</strong> or <strong>aortic surgery</strong>, regardless of other risk factors.</div>
+
+  <div class="cols3" style="margin-top:20px;">
+    <div class="risk-card low">
+      <div class="risk-title">Low Risk</div>
+      <div>Minimal physiologic disruption. No additional cardiac workup typically needed without active cardiac conditions.</div>
+      <div class="risk-examples"><strong>Examples:</strong> GI endoscopy, cataract surgery, minor dental procedures, breast biopsy, dermatologic surgery</div>
+    </div>
+    <div class="risk-card mod">
+      <div class="risk-title">Intermediate Risk</div>
+      <div>Moderate physiologic impact. Cardiac workup may be needed if risk factors are present.</div>
+      <div class="risk-examples"><strong>Examples:</strong> Most orthopedic surgeries (hip, knee, spine), intraabdominal, head and neck, prostate, pulmonary resection</div>
+    </div>
+    <div class="risk-card high">
+      <div class="risk-title">High Risk</div>
+      <div>Significant hemodynamic disruption, major blood loss risk. Cardiac workup warranted for most patients with risk factors.</div>
+      <div class="risk-examples"><strong>Examples:</strong> Intrathoracic, major intraperitoneal, infra-inguinal vascular, aortic surgery</div>
     </div>
   </div>
 </div>
@@ -859,150 +1027,6 @@ details[open] > summary::before { transform: rotate(90deg); }
   </table>
 
   <p class="tip">Alternatives: MICA (Gupta) on MDCalc — predicts MI or cardiac arrest at 30 days. NSQIP (ACS) — comprehensive but time-consuming. Both are acceptable.</p>
-</div>
-
-<!-- ═══ SURGERY RISK ═══ -->
-<div class="section" id="surgery-risk">
-  <h2>Surgery Risk Classification</h2>
-  <p>Required element of every pre-op eval. Risk is based on expected physiologic disruption, hemodynamic impact, and blood loss potential.</p>
-
-  <div class="callout danger"><strong>Emergent/urgent surgery is an independent risk factor.</strong> Document and communicate this explicitly regardless of other risk factors.</div>
-  <div class="callout warn">Cardiac workup is required for <strong>all</strong> patients undergoing <strong>liver transplant</strong> or <strong>aortic surgery</strong>, regardless of other risk factors.</div>
-
-  <div class="cols3" style="margin-top:20px;">
-    <div class="risk-card low">
-      <div class="risk-title">Low Risk</div>
-      <div>Minimal physiologic disruption. No additional cardiac workup typically needed without active cardiac conditions.</div>
-      <div class="risk-examples"><strong>Examples:</strong> GI endoscopy, cataract surgery, minor dental procedures, breast biopsy, dermatologic surgery</div>
-    </div>
-    <div class="risk-card mod">
-      <div class="risk-title">Intermediate Risk</div>
-      <div>Moderate physiologic impact. Cardiac workup may be needed if risk factors are present.</div>
-      <div class="risk-examples"><strong>Examples:</strong> Most orthopedic surgeries (hip, knee, spine), intraabdominal, head and neck, prostate, pulmonary resection</div>
-    </div>
-    <div class="risk-card high">
-      <div class="risk-title">High Risk</div>
-      <div>Significant hemodynamic disruption, major blood loss risk. Cardiac workup warranted for most patients with risk factors.</div>
-      <div class="risk-examples"><strong>Examples:</strong> Intrathoracic, major intraperitoneal, infra-inguinal vascular, aortic surgery</div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ METs ═══ -->
-<div class="section" id="mets">
-  <h2>Functional Status / METs</h2>
-  <p>Functional status is one of the strongest predictors of cardiovascular readiness for surgery. Patients who cannot perform at least 4 METs at baseline need further cardiac evaluation considered.</p>
-
-  <div class="callout"><strong>The threshold is 4 METs.</strong> Ask: "Can you climb 2 flights of stairs or walk 2 blocks on flat ground at a brisk pace without stopping?" Yes → ≥4 METs.</div>
-
-  <!-- Visual METs scale -->
-  <div class="mets-scale">
-    <div class="mets-threshold">4 METs — Threshold</div>
-    <div class="mets-bar" style="margin-top:32px;">
-      <div class="mets-seg s1" style="flex:1;">1</div>
-      <div class="mets-seg s2" style="flex:1.5;">2–3</div>
-      <div class="mets-seg s3" style="flex:.5; color:#333;">4</div>
-      <div class="mets-seg s4" style="flex:3;">5–9</div>
-      <div class="mets-seg s4" style="flex:2; background:#1b5e20;">10+</div>
-    </div>
-    <div class="mets-labels" style="justify-content:space-between; padding: 0 2px;">
-      <span>Minimal</span><span>Light</span><span style="font-weight:800; color:#000;">✓ Target</span><span>Good</span><span>Excellent</span>
-    </div>
-  </div>
-
-  <table>
-    <thead><tr><th>METs</th><th>What It Means</th><th>Activity Examples</th></tr></thead>
-    <tbody>
-      <tr><td><strong>1</strong></td><td>Basic self-care only</td><td>Eating, dressing, walking slowly around the house</td></tr>
-      <tr><td><strong>2–3</strong></td><td>Light activity, limited reserve</td><td>Cooking, light housework, walking 1–2 blocks slowly</td></tr>
-      <tr><td><strong style="color:#1a4d2e;">4 ✓</strong></td><td><strong>Target threshold — adequate for most surgeries</strong></td><td>Climbing 2 flights of stairs, walking 2 blocks at 3–4 mph, light yard work, golf (walking)</td></tr>
-      <tr><td><strong>5–9</strong></td><td>Good to excellent functional status</td><td>Running, swimming laps, doubles tennis, vigorous dancing</td></tr>
-      <tr><td><strong>&gt;10</strong></td><td>Excellent cardiovascular reserve</td><td>Competitive sports, heavy manual labor, vigorous running</td></tr>
-    </tbody>
-  </table>
-
-  <h3>Documentation Language</h3>
-  <div class="sample">Adequate: "Patient fully functional at baseline. Able to climb 2 flights of stairs and walk several blocks without symptoms. Functional status ≥4 METs."</div>
-  <div class="sample">Limited: "Patient with limited functional status. Unable to climb a full flight of stairs due to dyspnea. Functional status estimated &lt;4 METs. Further cardiac evaluation warranted."</div>
-  <p class="tip">If functional status is unknown or unreliable, treat as &lt;4 METs and apply workup criteria accordingly.</p>
-</div>
-
-<!-- ═══ CAPRINI ═══ -->
-<div class="section" id="caprini">
-  <h2>Caprini VTE Risk Assessment</h2>
-  <p>Estimates perioperative VTE risk. Calculate and document the score and recommendation in the A/P. Available also on MDCalc or UpToDate.</p>
-  <p class="tip">For Caprini: "minor surgery" = &lt;45 min under anesthesia; "major surgery" = ≥45 min. Separate from cardiac risk classification.</p>
-
-  <div class="calc-box">
-    <div class="calc-header">Caprini VTE Calculator</div>
-    <div class="calc-body">
-
-      <div class="cap-group">
-        <div class="cap-group-label">1 Point Each</div>
-        <div class="cap-item"><input type="checkbox" id="c_41_60" onchange="calcCaprini()"><label for="c_41_60">Age 41–60</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_minor_surg" onchange="calcCaprini()"><label for="c_minor_surg">Minor surgery planned</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_prev_surg" onchange="calcCaprini()"><label for="c_prev_surg">History of prior major surgery</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_varicose" onchange="calcCaprini()"><label for="c_varicose">Varicose veins</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_ibd" onchange="calcCaprini()"><label for="c_ibd">History of IBD</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_swollen" onchange="calcCaprini()"><label for="c_swollen">Swollen legs (current)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_obese" onchange="calcCaprini()"><label for="c_obese">Obesity (BMI &gt;25)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_ami" onchange="calcCaprini()"><label for="c_ami">Acute MI (within 1 month)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_chf_1" onchange="calcCaprini()"><label for="c_chf_1">CHF (within 1 month)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_sepsis" onchange="calcCaprini()"><label for="c_sepsis">Sepsis (within 1 month)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_lung" onchange="calcCaprini()"><label for="c_lung">Serious lung disease / pneumonia (within 1 month)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_copd" onchange="calcCaprini()"><label for="c_copd">Abnormal pulmonary function (COPD)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_bedrest_med" onchange="calcCaprini()"><label for="c_bedrest_med">Medical patient currently on bed rest</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_ocp" onchange="calcCaprini()"><label for="c_ocp">Oral contraceptives or HRT</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_preg" onchange="calcCaprini()"><label for="c_preg">Pregnancy or postpartum (&lt;1 month)</label><span class="cap-badge">+1</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_abort" onchange="calcCaprini()"><label for="c_abort">History of unexplained or recurrent spontaneous abortion</label><span class="cap-badge">+1</span></div>
-      </div>
-
-      <div class="cap-group">
-        <div class="cap-group-label">2 Points Each</div>
-        <div class="cap-item"><input type="checkbox" id="c_61_74" onchange="calcCaprini()"><label for="c_61_74">Age 61–74</label><span class="cap-badge">+2</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_arthro" onchange="calcCaprini()"><label for="c_arthro">Arthroscopic surgery</label><span class="cap-badge">+2</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_malignancy" onchange="calcCaprini()"><label for="c_malignancy">Malignancy (present or previous)</label><span class="cap-badge">+2</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_major45" onchange="calcCaprini()"><label for="c_major45">Major surgery &gt;45 minutes (open or laparoscopic)</label><span class="cap-badge">+2</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_bedrest72" onchange="calcCaprini()"><label for="c_bedrest72">Confined to bed &gt;72 hours</label><span class="cap-badge">+2</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_cast" onchange="calcCaprini()"><label for="c_cast">Immobilizing plaster cast (within 1 month)</label><span class="cap-badge">+2</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_cvc" onchange="calcCaprini()"><label for="c_cvc">Central venous access</label><span class="cap-badge">+2</span></div>
-      </div>
-
-      <div class="cap-group">
-        <div class="cap-group-label">3 Points Each</div>
-        <div class="cap-item"><input type="checkbox" id="c_75plus" onchange="calcCaprini()"><label for="c_75plus">Age ≥75</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_dvt_hx" onchange="calcCaprini()"><label for="c_dvt_hx">History of DVT/PE</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_fam_dvt" onchange="calcCaprini()"><label for="c_fam_dvt">Family history of thrombosis</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_factorV" onchange="calcCaprini()"><label for="c_factorV">Positive Factor V Leiden</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_pt20210" onchange="calcCaprini()"><label for="c_pt20210">Positive prothrombin 20210A</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_homocys" onchange="calcCaprini()"><label for="c_homocys">Elevated serum homocysteine</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_lupus_ac" onchange="calcCaprini()"><label for="c_lupus_ac">Positive lupus anticoagulant</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_acl" onchange="calcCaprini()"><label for="c_acl">Elevated anticardiolipin antibodies</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_hit" onchange="calcCaprini()"><label for="c_hit">Heparin-induced thrombocytopenia (HIT)</label><span class="cap-badge">+3</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_other_thrombo" onchange="calcCaprini()"><label for="c_other_thrombo">Other congenital or acquired thrombophilia</label><span class="cap-badge">+3</span></div>
-      </div>
-
-      <div class="cap-group">
-        <div class="cap-group-label">5 Points Each</div>
-        <div class="cap-item"><input type="checkbox" id="c_stroke" onchange="calcCaprini()"><label for="c_stroke">Stroke (within 1 month)</label><span class="cap-badge">+5</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_arthroplasty" onchange="calcCaprini()"><label for="c_arthroplasty">Elective arthroplasty (joint replacement)</label><span class="cap-badge">+5</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_fracture" onchange="calcCaprini()"><label for="c_fracture">Hip, pelvis, or leg fracture (within 1 month)</label><span class="cap-badge">+5</span></div>
-        <div class="cap-item"><input type="checkbox" id="c_sci" onchange="calcCaprini()"><label for="c_sci">Acute spinal cord injury (within 1 month)</label><span class="cap-badge">+5</span></div>
-      </div>
-
-    </div>
-    <div class="calc-result" id="caprini-result">Caprini Score: 0 — Low risk (~1.5% VTE). Early ambulation only.</div>
-  </div>
-
-  <table>
-    <thead><tr><th>Score</th><th>Risk Level</th><th>Est. VTE Risk</th><th>Recommendation</th></tr></thead>
-    <tbody>
-      <tr><td>0–1</td><td><span class="tag low">Low</span></td><td>~1.5%</td><td>Early ambulation only</td></tr>
-      <tr><td>2</td><td><span class="tag mod">Moderate</span></td><td>~2.5–3%</td><td>Pharmacological prophylaxis (UFH or LMWH) OR mechanical (SCDs)</td></tr>
-      <tr><td>3–4</td><td><span class="tag high">High</span></td><td>~5–6%</td><td>Pharmacological + consider mechanical prophylaxis</td></tr>
-      <tr><td>≥5</td><td><span class="tag vhigh">Very High</span></td><td>6–80%</td><td>Pharmacological + mechanical; consider extended duration (28 days post-op)</td></tr>
-    </tbody>
-  </table>
 </div>
 
 <!-- ═══ FURTHER TESTING ═══ -->
@@ -1094,41 +1118,6 @@ details[open] > summary::before { transform: rotate(90deg); }
   </details>
 </div>
 
-<!-- ═══ ABX ═══ -->
-<div class="section" id="abx">
-  <h2>Antibiotic Prophylaxis</h2>
-  <p>IE prophylaxis is indicated for high-risk cardiac conditions undergoing procedures likely to cause bacteremia. Most routine surgical procedures do not require IE prophylaxis.</p>
-
-  <h3>Cardiac Conditions Requiring Prophylaxis</h3>
-  <ul>
-    <li>Prosthetic cardiac valves (mechanical or bioprosthetic)</li>
-    <li>Prior infective endocarditis</li>
-    <li>Unrepaired cyanotic congenital heart disease (CHD)</li>
-    <li>CHD repaired with prosthetic material within the past 6 months</li>
-    <li>Repaired CHD with residual defects adjacent to prosthetic material</li>
-    <li>Cardiac transplant recipients with cardiac valvulopathy</li>
-  </ul>
-
-  <h3>Procedures Warranting Prophylaxis</h3>
-  <ul>
-    <li>Dental procedures involving manipulation of gingival tissue or perforation of oral mucosa</li>
-    <li>Respiratory tract procedures involving incision of respiratory mucosa</li>
-    <li>GI/GU procedures — only if active GI/GU infection at time of procedure</li>
-  </ul>
-
-  <div class="callout danger">Document in A/P: <em>"Antibiotic prophylaxis: indicated due to [condition] — [regimen]"</em> OR <em>"Antibiotic prophylaxis: not indicated."</em></div>
-
-  <table>
-    <thead><tr><th>Scenario</th><th>Agent</th><th>Dose / Timing</th></tr></thead>
-    <tbody>
-      <tr><td>Standard (oral)</td><td>Amoxicillin</td><td>2g PO 30–60 min before procedure</td></tr>
-      <tr><td>Unable to take oral</td><td>Ampicillin OR Cefazolin/Ceftriaxone</td><td>Ampicillin 2g IM/IV OR Cefazolin 1g IM/IV — 30–60 min before</td></tr>
-      <tr><td>Penicillin allergy (oral)</td><td>Clindamycin OR Azithromycin/Clarithromycin</td><td>Clindamycin 600mg PO OR Azithromycin 500mg PO — 30–60 min before</td></tr>
-      <tr><td>Penicillin allergy (IV)</td><td>Clindamycin</td><td>600mg IM/IV — 30–60 min before</td></tr>
-    </tbody>
-  </table>
-</div>
-
 <!-- ═══ MEDICATIONS ═══ -->
 <div class="section" id="meds">
   <h2>Perioperative Medication Management</h2>
@@ -1203,6 +1192,119 @@ details[open] > summary::before { transform: rotate(90deg); }
         <td>Consider stress dose steroids</td>
         <td>If ≥5mg prednisone (or equivalent) daily for ≥3 weeks → consider stress dose or cosyntropin stimulation test.</td>
       </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ ABX ═══ -->
+<div class="section" id="abx">
+  <h2>Antibiotic Prophylaxis</h2>
+  <p>IE prophylaxis is indicated for high-risk cardiac conditions undergoing procedures likely to cause bacteremia. Most routine surgical procedures do not require IE prophylaxis.</p>
+
+  <h3>Cardiac Conditions Requiring Prophylaxis</h3>
+  <ul>
+    <li>Prosthetic cardiac valves (mechanical or bioprosthetic)</li>
+    <li>Prior infective endocarditis</li>
+    <li>Unrepaired cyanotic congenital heart disease (CHD)</li>
+    <li>CHD repaired with prosthetic material within the past 6 months</li>
+    <li>Repaired CHD with residual defects adjacent to prosthetic material</li>
+    <li>Cardiac transplant recipients with cardiac valvulopathy</li>
+  </ul>
+
+  <h3>Procedures Warranting Prophylaxis</h3>
+  <ul>
+    <li>Dental procedures involving manipulation of gingival tissue or perforation of oral mucosa</li>
+    <li>Respiratory tract procedures involving incision of respiratory mucosa</li>
+    <li>GI/GU procedures — only if active GI/GU infection at time of procedure</li>
+  </ul>
+
+  <div class="callout danger">Document in A/P: <em>"Antibiotic prophylaxis: indicated due to [condition] — [regimen]"</em> OR <em>"Antibiotic prophylaxis: not indicated."</em></div>
+
+  <table>
+    <thead><tr><th>Scenario</th><th>Agent</th><th>Dose / Timing</th></tr></thead>
+    <tbody>
+      <tr><td>Standard (oral)</td><td>Amoxicillin</td><td>2g PO 30–60 min before procedure</td></tr>
+      <tr><td>Unable to take oral</td><td>Ampicillin OR Cefazolin/Ceftriaxone</td><td>Ampicillin 2g IM/IV OR Cefazolin 1g IM/IV — 30–60 min before</td></tr>
+      <tr><td>Penicillin allergy (oral)</td><td>Clindamycin OR Azithromycin/Clarithromycin</td><td>Clindamycin 600mg PO OR Azithromycin 500mg PO — 30–60 min before</td></tr>
+      <tr><td>Penicillin allergy (IV)</td><td>Clindamycin</td><td>600mg IM/IV — 30–60 min before</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ═══ CAPRINI ═══ -->
+<div class="section" id="caprini">
+  <h2>Caprini VTE Risk Assessment</h2>
+  <p>Estimates perioperative VTE risk. Calculate and document the score and recommendation in the A/P. Available also on MDCalc or UpToDate.</p>
+  <p class="tip">For Caprini: "minor surgery" = &lt;45 min under anesthesia; "major surgery" = ≥45 min. Separate from cardiac risk classification.</p>
+
+  <div class="calc-box">
+    <div class="calc-header">Caprini VTE Calculator</div>
+    <div class="calc-body">
+
+      <div class="cap-group">
+        <div class="cap-group-label">1 Point Each</div>
+        <div class="cap-item"><input type="checkbox" id="c_41_60" onchange="calcCaprini()"><label for="c_41_60">Age 41–60</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_minor_surg" onchange="calcCaprini()"><label for="c_minor_surg">Minor surgery planned</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_prev_surg" onchange="calcCaprini()"><label for="c_prev_surg">History of prior major surgery</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_varicose" onchange="calcCaprini()"><label for="c_varicose">Varicose veins</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_ibd" onchange="calcCaprini()"><label for="c_ibd">History of IBD</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_swollen" onchange="calcCaprini()"><label for="c_swollen">Swollen legs (current)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_obese" onchange="calcCaprini()"><label for="c_obese">Obesity (BMI &gt;25)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_ami" onchange="calcCaprini()"><label for="c_ami">Acute MI (within 1 month)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_chf_1" onchange="calcCaprini()"><label for="c_chf_1">CHF (within 1 month)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_sepsis" onchange="calcCaprini()"><label for="c_sepsis">Sepsis (within 1 month)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_lung" onchange="calcCaprini()"><label for="c_lung">Serious lung disease / pneumonia (within 1 month)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_copd" onchange="calcCaprini()"><label for="c_copd">Abnormal pulmonary function (COPD)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_bedrest_med" onchange="calcCaprini()"><label for="c_bedrest_med">Medical patient currently on bed rest</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_ocp" onchange="calcCaprini()"><label for="c_ocp">Oral contraceptives or HRT</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_preg" onchange="calcCaprini()"><label for="c_preg">Pregnancy or postpartum (&lt;1 month)</label><span class="cap-badge">+1</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_abort" onchange="calcCaprini()"><label for="c_abort">History of unexplained or recurrent spontaneous abortion</label><span class="cap-badge">+1</span></div>
+      </div>
+
+      <div class="cap-group">
+        <div class="cap-group-label">2 Points Each</div>
+        <div class="cap-item"><input type="checkbox" id="c_61_74" onchange="calcCaprini()"><label for="c_61_74">Age 61–74</label><span class="cap-badge">+2</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_arthro" onchange="calcCaprini()"><label for="c_arthro">Arthroscopic surgery</label><span class="cap-badge">+2</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_malignancy" onchange="calcCaprini()"><label for="c_malignancy">Malignancy (present or previous)</label><span class="cap-badge">+2</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_major45" onchange="calcCaprini()"><label for="c_major45">Major surgery &gt;45 minutes (open or laparoscopic)</label><span class="cap-badge">+2</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_bedrest72" onchange="calcCaprini()"><label for="c_bedrest72">Confined to bed &gt;72 hours</label><span class="cap-badge">+2</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_cast" onchange="calcCaprini()"><label for="c_cast">Immobilizing plaster cast (within 1 month)</label><span class="cap-badge">+2</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_cvc" onchange="calcCaprini()"><label for="c_cvc">Central venous access</label><span class="cap-badge">+2</span></div>
+      </div>
+
+      <div class="cap-group">
+        <div class="cap-group-label">3 Points Each</div>
+        <div class="cap-item"><input type="checkbox" id="c_75plus" onchange="calcCaprini()"><label for="c_75plus">Age ≥75</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_dvt_hx" onchange="calcCaprini()"><label for="c_dvt_hx">History of DVT/PE</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_fam_dvt" onchange="calcCaprini()"><label for="c_fam_dvt">Family history of thrombosis</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_factorV" onchange="calcCaprini()"><label for="c_factorV">Positive Factor V Leiden</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_pt20210" onchange="calcCaprini()"><label for="c_pt20210">Positive prothrombin 20210A</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_homocys" onchange="calcCaprini()"><label for="c_homocys">Elevated serum homocysteine</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_lupus_ac" onchange="calcCaprini()"><label for="c_lupus_ac">Positive lupus anticoagulant</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_acl" onchange="calcCaprini()"><label for="c_acl">Elevated anticardiolipin antibodies</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_hit" onchange="calcCaprini()"><label for="c_hit">Heparin-induced thrombocytopenia (HIT)</label><span class="cap-badge">+3</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_other_thrombo" onchange="calcCaprini()"><label for="c_other_thrombo">Other congenital or acquired thrombophilia</label><span class="cap-badge">+3</span></div>
+      </div>
+
+      <div class="cap-group">
+        <div class="cap-group-label">5 Points Each</div>
+        <div class="cap-item"><input type="checkbox" id="c_stroke" onchange="calcCaprini()"><label for="c_stroke">Stroke (within 1 month)</label><span class="cap-badge">+5</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_arthroplasty" onchange="calcCaprini()"><label for="c_arthroplasty">Elective arthroplasty (joint replacement)</label><span class="cap-badge">+5</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_fracture" onchange="calcCaprini()"><label for="c_fracture">Hip, pelvis, or leg fracture (within 1 month)</label><span class="cap-badge">+5</span></div>
+        <div class="cap-item"><input type="checkbox" id="c_sci" onchange="calcCaprini()"><label for="c_sci">Acute spinal cord injury (within 1 month)</label><span class="cap-badge">+5</span></div>
+      </div>
+
+    </div>
+    <div class="calc-result" id="caprini-result">Caprini Score: 0 — Low risk (~1.5% VTE). Early ambulation only.</div>
+  </div>
+
+  <table>
+    <thead><tr><th>Score</th><th>Risk Level</th><th>Est. VTE Risk</th><th>Recommendation</th></tr></thead>
+    <tbody>
+      <tr><td>0–1</td><td><span class="tag low">Low</span></td><td>~1.5%</td><td>Early ambulation only</td></tr>
+      <tr><td>2</td><td><span class="tag mod">Moderate</span></td><td>~2.5–3%</td><td>Pharmacological prophylaxis (UFH or LMWH) OR mechanical (SCDs)</td></tr>
+      <tr><td>3–4</td><td><span class="tag high">High</span></td><td>~5–6%</td><td>Pharmacological + consider mechanical prophylaxis</td></tr>
+      <tr><td>≥5</td><td><span class="tag vhigh">Very High</span></td><td>6–80%</td><td>Pharmacological + mechanical; consider extended duration (28 days post-op)</td></tr>
     </tbody>
   </table>
 </div>
@@ -1304,7 +1406,7 @@ details[open] > summary::before { transform: rotate(90deg); }
     <summary>Cardiac Device — Pacemaker</summary>
     <div class="det-body">
       <ul>
-        <li>Must be set to a <strong>fixed (asynchronous) rate</strong> by cardiology before surgery to prevent inhibition from electrocautery</li>
+        <li>Must be set to a <strong>fixed rate</strong> by cardiology before surgery to prevent inhibition from electrocautery</li>
         <li>Reset to original programming after the procedure</li>
         <li>Determine pacemaker dependency — if dependent, more stringent intraoperative precautions apply</li>
       </ul>
@@ -1329,7 +1431,7 @@ details[open] > summary::before { transform: rotate(90deg); }
       <ul>
         <li>Do NOT stop DAPT without cardiology guidance — risk of catastrophic in-stent thrombosis</li>
         <li>Consult cardiology for all patients on DAPT for CAD before any antiplatelet decisions</li>
-        <li>If surgery cannot wait, discuss risk-benefit with cardiology and surgery together</li>
+        <li>Try to delay surgery for 6 months after DES (at least 3mos if critical), 1 month after BMS. If surgery cannot wait, discuss risk-benefit with cardiology and surgery together</li>
       </ul>
     </div>
   </details>
@@ -1340,7 +1442,7 @@ details[open] > summary::before { transform: rotate(90deg); }
       <ul>
         <li>Screen with ROS: snoring, witnessed apneas, daytime sleepiness</li>
         <li>If undiagnosed and concern is high → consider sleep study before elective surgery</li>
-        <li>Continue home CPAP perioperatively — patient should bring it to hospital</li>
+        <li>Continue home CPAP perioperatively</li>
         <li>Continue home O₂ if prescribed</li>
         <li><strong>Moderate or severe OSA:</strong> explicitly document increased risk for perioperative respiratory complications in the A/P</li>
       </ul>
@@ -1363,7 +1465,7 @@ details[open] > summary::before { transform: rotate(90deg); }
   <details>
     <summary>Chronic Liver Disease / Cirrhosis</summary>
     <div class="det-body">
-      <p>Check <strong>MELD score (original pre-2016 version, without sodium)</strong> on MDCalc:</p>
+      <p>Check <strong>Original MELD score </strong> (pre-2016 version, without sodium) on MDCalc:</p>
       <table>
         <thead><tr><th>MELD Score</th><th>3-Month Mortality Risk</th><th>Recommendation</th></tr></thead>
         <tbody>
@@ -1375,7 +1477,7 @@ details[open] > summary::before { transform: rotate(90deg); }
       <ul>
         <li>Order LFTs, coags (PT/INR), and CBC (platelets) for all patients with chronic liver disease</li>
         <li>Treat coagulopathy and ascites before surgery</li>
-        <li>Portal hypertension → hepatology consultation</li>
+        <li>Portal  Is a risk factor for surgical complications → hepatology consultation</li>
         <li>Abdominal and thoracic surgeries carry much higher risk in liver disease</li>
         <li><strong>Acute hepatitis (especially alcoholic) is a contraindication to surgery</strong></li>
       </ul>
@@ -1389,7 +1491,6 @@ details[open] > summary::before { transform: rotate(90deg); }
         <li>Consider CXR for all patients with lung disease, OSA, pulmonary HTN, or significant smoking history</li>
         <li>Check spirometry if symptomatic or insufficiently treated</li>
         <li>Optimize COPD management (bronchodilators, steroids if indicated)</li>
-        <li>Continue home CPAP and supplemental O₂</li>
         <li>Pulmonary HTN: pulmonology or cardiology consult; high perioperative risk</li>
         <li>Active smoking: counsel on cessation — stopping even a few weeks before surgery reduces complications</li>
       </ul>
@@ -1401,8 +1502,7 @@ details[open] > summary::before { transform: rotate(90deg); }
     <div class="det-body">
       <ul>
         <li>Obtain PT/INR, PTT, platelet count</li>
-        <li>Bleeding history without diagnosis → consider von Willebrand panel, factor levels</li>
-        <li>Clotting history (DVT, PE, stroke) → consider hypercoagulability workup (antithrombin III, protein C/S, factor V Leiden, antiphospholipid antibodies)</li>
+        <li>Bleeding history without diagnosis → consider hematology consult</li>
         <li>Anticoagulated patients: identify hold/restart dates and bridging strategy; document for patient and surgeon</li>
         <li>Transfusion consent must be documented for all patients</li>
       </ul>
@@ -1414,12 +1514,17 @@ details[open] > summary::before { transform: rotate(90deg); }
     <div class="det-body">
       <ul>
         <li>Active infection (fevers, chills, currently on antibiotics): <strong>delay elective surgery</strong></li>
-        <li>Inform the surgeon if delay is needed</li>
         <li>Emergent/urgent surgery with active infection: proceed but notify surgical and anesthesia teams; document clinical context</li>
       </ul>
     </div>
   </details>
 </div>
+
+<footer class="site-footer">
+  <p><strong>Disclaimer:</strong> This guide is for educational and internal workflow support only. It does not constitute medical advice, establish a standard of care, or replace independent clinical judgment, institutional policy, or current specialty guidelines.</p>
+  <p class="footer-meta">Last updated: April 4, 2026</p>
+  <p class="footer-byline">Created for internal use only by A.MacKenzie © 2026.</p>
+</footer>
 
 </main>
 
@@ -1644,6 +1749,23 @@ function toggleTree() {
   btn.textContent = open ? 'Show Decision Tree' : 'Hide Decision Tree';
 }
 
+const SIDEBAR_HIDDEN_KEY = 'preop-sidebar-hidden';
+function syncSidebarToggle() {
+  const btn = document.getElementById('sidebar-toggle');
+  if (!btn) return;
+  const hidden = document.body.classList.contains('sidebar-hidden');
+  btn.setAttribute('aria-expanded', hidden ? 'false' : 'true');
+  btn.setAttribute('aria-label', hidden ? 'Show navigation' : 'Hide navigation');
+}
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-hidden');
+  const hidden = document.body.classList.contains('sidebar-hidden');
+  try {
+    localStorage.setItem(SIDEBAR_HIDDEN_KEY, hidden ? '1' : '0');
+  } catch (e) { /* file:// or private mode */ }
+  syncSidebarToggle();
+}
+
 // ── Sidebar active link on scroll ──
 const sections = document.querySelectorAll('[id]');
 const links = document.querySelectorAll('#sidebar a');
@@ -1658,6 +1780,15 @@ window.addEventListener('scroll', updateActive, { passive: true });
 
 // ── Init ──
 document.addEventListener('DOMContentLoaded', () => {
+  try {
+    if (localStorage.getItem(SIDEBAR_HIDDEN_KEY) === '1') {
+      document.body.classList.add('sidebar-hidden');
+    }
+  } catch (e) { /* file:// or private mode */ }
+  syncSidebarToggle();
+  const sidebarBtn = document.getElementById('sidebar-toggle');
+  if (sidebarBtn) sidebarBtn.addEventListener('click', toggleSidebar);
+
   renderFlow();
   updateActive();
 });
